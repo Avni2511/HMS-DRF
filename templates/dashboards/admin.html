@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard — HMS{% endblock %}
+
+{% block extra_head %}
+<style>
+  .dash-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 1.2rem; }
+  .quick-action {
+    display: flex; align-items: center; gap: .75rem;
+    padding: .8rem 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--hms-border);
+    background: var(--hms-card);
+    font-size: .87rem; font-weight: 500;
+    color: var(--hms-text);
+    transition: all .2s;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .quick-action:hover {
+    border-color: var(--hms-primary);
+    background: rgba(10,92,153,.04);
+    color: var(--hms-primary);
+    transform: translateX(3px);
+  }
+  .quick-action i { font-size: 1.1rem; color: var(--hms-primary); }
+  .section-card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1.2rem;
+  }
+  .section-card-header h5 {
+    font-family:'Syne',sans-serif; font-size:1rem; font-weight:700; margin:0;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hms-layout">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="hms-sidebar">
+    <div class="nav-user-pill mb-3">
+      <div class="nav-avatar">A</div>
+      <span>Admin Panel</span>
+    </div>
+    <div class="sidebar-section-label">Main</div>
+    <a href="#overview"       class="sidebar-link active"><i class="bi bi-speedometer2"></i> Overview</a>
+    <a href="{% url 'doctor_list' %}"      class="sidebar-link"><i class="bi bi-person-badge"></i> Doctors</a>
+    <a href="{% url 'appointment_list' %}" class="sidebar-link"><i class="bi bi-calendar2-check"></i> Appointments</a>
+    <div class="sidebar-section-label">Reports</div>
+    <a href="#" class="sidebar-link"><i class="bi bi-bar-chart-line"></i> Analytics</a>
+    <a href="#" class="sidebar-link"><i class="bi bi-file-earmark-medical"></i> Reports</a>
+    <div class="sidebar-section-label">Settings</div>
+    <a href="#" class="sidebar-link"><i class="bi bi-gear"></i> Settings</a>
+    <a href="{% url 'logout' %}" class="sidebar-link" style="color:var(--hms-danger)">
+      <i class="bi bi-box-arrow-right"></i> Logout
+    </a>
+  </aside>
+
+  <!-- ── MAIN CONTENT ── -->
+  <main class="hms-content">
+
+    <!-- Page Header -->
+    <div class="page-header fade-up" id="overview">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+          <p class="section-eyebrow mb-1">Administrator</p>
+          <h1>System Overview</h1>
+          <p>Welcome back! Here's a snapshot of the hospital today.</p>
+        </div>
+        <div class="d-flex gap-2">
+          <a href="{% url 'doctor_list' %}" class="btn-hms-outline" style="font-size:.83rem;padding:.45rem 1rem;">
+            <i class="bi bi-person-plus"></i> Add Doctor
+          </a>
+          <a href="{% url 'book_appointment' %}" class="btn-hms-primary" style="font-size:.83rem;padding:.45rem 1rem;">
+            <i class="bi bi-calendar2-plus"></i> New Appointment
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STAT CARDS ── -->
+    <div class="row g-3 mb-4">
+      <div class="col-sm-6 col-xl-4 fade-up fade-up-d1">
+        <div class="stat-card blue">
+          <div class="stat-icon blue"><i class="bi bi-person-badge-fill"></i></div>
+          <div>
+            <div class="stat-value">{{  total_doctors }}</div>
+            <div class="stat-label">Total Doctors</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-xl-4 fade-up fade-up-d2">
+        <div class="stat-card green">
+          <div class="stat-icon green"><i class="bi bi-people-fill"></i></div>
+          <div>
+            <div class="stat-value">{{ total_patients }}</div>
+            <div class="stat-label">Total Patients</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-xl-4 fade-up fade-up-d3">
+        <div class="stat-card teal">
+          <div class="stat-icon teal"><i class="bi bi-calendar2-check-fill"></i></div>
+          <div>
+            <div class="stat-value">{{ total_appointments }}</div>
+            <div class="stat-label">Total Appointments</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MAIN GRID ── -->
+    <div class="row g-3">
+
+      <!-- Recent Appointments -->
+      <div class="col-xl-8 fade-up fade-up-d1">
+        <div class="hms-card p-0 overflow-hidden">
+          <div class="p-4 pb-0">
+            <div class="section-card-header">
+              <h5><i class="bi bi-calendar2-check text-primary me-2"></i>Recent Appointments</h5>
+              <a href="{% url 'appointment_list' %}" class="btn-hms-outline" style="font-size:.78rem;padding:.3rem .8rem;">
+                View All <i class="bi bi-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="hms-table">
+              <thead>
+                <tr>
+                  <th>Patient</th>
+                  <th>Doctor</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for appt in appointments %}
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="nav-avatar" style="width:28px;height:28px;font-size:.68rem">
+                        {{ appt.patient.user.username|first|upper }}
+                      </div>
+                      {{ appt.patient.user.username }}
+                    </div>
+                  </td>
+                  <td>Dr. {{ appt.doctor.user.username }}</td>
+                  <td><i class="bi bi-calendar3 me-1 text-muted"></i>{{ appt.date }}</td>
+                  <td><i class="bi bi-clock me-1 text-muted"></i>{{ appt.time }}</td>
+                  <td>
+                    {% if appt.status == 'Approved' %}
+                      <span class="hms-badge badge-approved">
+                        <i class="bi bi-check-circle-fill me-1"></i>Approved
+                      </span>
+                    {% elif appt.status == 'Pending' %}
+                      <span class="hms-badge badge-pending">
+                        <i class="bi bi-hourglass-split me-1"></i>Pending
+                      </span>
+                    {% else %}
+                      <span class="hms-badge badge-cancelled">
+                        <i class="bi bi-x-circle-fill me-1"></i>Cancelled
+                      </span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="5">
+                    <div class="empty-state">
+                      <div class="empty-icon"><i class="bi bi-calendar2-x"></i></div>
+                      <h6>No appointments yet</h6>
+                      <p>Appointments will appear here once patients start booking.</p>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions + Summary -->
+      <div class="col-xl-4 fade-up fade-up-d2">
+
+        <!-- Quick Actions -->
+        <div class="hms-card p-4 mb-3">
+          <h5 class="mb-3" style="font-family:'Syne',sans-serif;font-size:1rem;font-weight:700">
+            <i class="bi bi-lightning-charge-fill text-warning me-2"></i>Quick Actions
+          </h5>
+          <div class="d-flex flex-column gap-2">
+            <a href="{% url 'book_appointment' %}" class="quick-action">
+              <i class="bi bi-calendar2-plus"></i> Book New Appointment
+            </a>
+            <a href="{% url 'doctor_list' %}" class="quick-action">
+              <i class="bi bi-person-badge"></i> View All Doctors
+            </a>
+            <a href="{% url 'appointment_list' %}" class="quick-action">
+              <i class="bi bi-list-check"></i> Manage Appointments
+            </a>
+            <a href="#" class="quick-action">
+              <i class="bi bi-file-earmark-bar-graph"></i> Generate Report
+            </a>
+          </div>
+        </div>
+
+        <!-- System Status -->
+        <div class="hms-card p-4">
+          <h5 class="mb-3" style="font-family:'Syne',sans-serif;font-size:1rem;font-weight:700">
+            <i class="bi bi-activity text-success me-2"></i>System Status
+          </h5>
+          {% for item in status_items %}
+          <div class="d-flex justify-content-between align-items-center py-2 border-bottom" style="font-size:.85rem">
+            <span class="text-muted">{{ item.label }}</span>
+            <span class="hms-badge {% if item.ok %}badge-approved{% else %}badge-cancelled{% endif %}">
+              {{ item.value }}
+            </span>
+          </div>
+          {% empty %}
+          <div class="d-flex justify-content-between align-items-center py-2 border-bottom" style="font-size:.85rem">
+            <span class="text-muted">Database</span>
+            <span class="hms-badge badge-approved"><i class="bi bi-circle-fill me-1" style="font-size:.5rem"></i>Online</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center py-2 border-bottom" style="font-size:.85rem">
+            <span class="text-muted">Booking System</span>
+            <span class="hms-badge badge-approved"><i class="bi bi-circle-fill me-1" style="font-size:.5rem"></i>Active</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center py-2" style="font-size:.85rem">
+            <span class="text-muted">Notifications</span>
+            <span class="hms-badge badge-pending"><i class="bi bi-circle-fill me-1" style="font-size:.5rem"></i>Pending</span>
+          </div>
+          {% endfor %}
+        </div>
+
+      </div>
+    </div><!-- /row -->
+
+  </main>
+</div>
+{% endblock %}

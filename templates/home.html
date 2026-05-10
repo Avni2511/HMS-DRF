@@ -1,0 +1,404 @@
+{% extends 'base.html' %}
+{% block title %}Home — HMS{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* ── HERO ────────────────────────────────────────────────── */
+  .hero-section {
+    background: linear-gradient(135deg, var(--hms-primary-dk) 0%, var(--hms-primary) 55%, var(--hms-accent) 100%);
+    color: #fff;
+    padding: 5rem 0 6rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-section::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .hero-blob {
+    position: absolute; right: -80px; top: -80px;
+    width: 420px; height: 420px;
+    background: rgba(255,255,255,.06);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .hero-blob2 {
+    position: absolute; right: 120px; bottom: -120px;
+    width: 260px; height: 260px;
+    background: rgba(255,255,255,.04);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: .4rem;
+    background: rgba(255,255,255,.15);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,.25);
+    color: #fff;
+    padding: .35rem .9rem;
+    border-radius: 50px;
+    font-size: .78rem; font-weight: 600; letter-spacing: .5px;
+    margin-bottom: 1.2rem;
+  }
+  .hero-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    font-weight: 800; line-height: 1.12;
+    margin-bottom: .8rem;
+  }
+  .hero-title span {
+    color: var(--hms-accent-lt);
+  }
+  .hero-sub {
+    font-size: 1.1rem;
+    opacity: .85;
+    max-width: 520px;
+    line-height: 1.65;
+    margin-bottom: 2rem;
+  }
+  .hero-cta-row { display: flex; gap: .85rem; flex-wrap: wrap; }
+  .btn-hero-primary {
+    background: #fff;
+    color: var(--hms-primary);
+    border: none;
+    border-radius: 12px;
+    padding: .8rem 1.8rem;
+    font-weight: 700; font-size: .95rem;
+    box-shadow: 0 6px 20px rgba(0,0,0,.15);
+    transition: all .25s;
+    display: inline-flex; align-items: center; gap: .4rem;
+  }
+  .btn-hero-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(0,0,0,.2);
+    color: var(--hms-primary-dk);
+  }
+  .btn-hero-ghost {
+    background: rgba(255,255,255,.15);
+    color: #fff;
+    border: 1.5px solid rgba(255,255,255,.4);
+    border-radius: 12px;
+    padding: .8rem 1.8rem;
+    font-weight: 600; font-size: .95rem;
+    transition: all .25s;
+    display: inline-flex; align-items: center; gap: .4rem;
+  }
+  .btn-hero-ghost:hover {
+    background: rgba(255,255,255,.25);
+    color: #fff;
+    transform: translateY(-2px);
+  }
+
+  /* Stats strip */
+  .hero-stats {
+    display: flex; gap: 2.5rem; margin-top: 2.5rem; flex-wrap: wrap;
+  }
+  .hero-stat-item {
+    display: flex; flex-direction: column;
+  }
+  .hero-stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem; font-weight: 800; line-height: 1;
+    color: #fff;
+  }
+  .hero-stat-lbl { font-size: .78rem; opacity: .7; margin-top: .15rem; }
+
+  /* Hero illustration */
+  .hero-visual {
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hero-illustration {
+    width: 100%; max-width: 420px;
+    background: rgba(255,255,255,.1);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 20px;
+    padding: 2rem;
+    position: relative;
+  }
+  .hero-ill-header {
+    display: flex; align-items: center; gap: .75rem;
+    margin-bottom: 1.4rem;
+  }
+  .hero-ill-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(255,255,255,.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+  }
+  .hero-ill-title { font-family:'Syne',sans-serif; font-size:1rem; font-weight:700; }
+  .hero-ill-sub   { font-size:.75rem; opacity:.7; }
+  .hero-ill-row {
+    display: flex; align-items: center; gap: .75rem;
+    background: rgba(255,255,255,.12); border-radius: 10px;
+    padding: .7rem .9rem; margin-bottom: .55rem;
+    font-size: .83rem;
+  }
+  .hero-ill-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .dot-green { background: #4ade80; }
+  .dot-yellow { background: #fbbf24; }
+  .dot-blue { background: var(--hms-accent-lt); }
+
+  /* ── FEATURE CARDS ─────────────────────────────────────────── */
+  .features-section {
+    padding: 5rem 0;
+  }
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.6rem, 3vw, 2.3rem);
+    font-weight: 800; color: var(--hms-text);
+  }
+  .feature-card {
+    background: var(--hms-card);
+    border: 1px solid var(--hms-border);
+    border-radius: var(--hms-radius);
+    box-shadow: var(--hms-shadow-sm);
+    padding: 2.2rem 1.8rem;
+    height: 100%;
+    transition: all .3s cubic-bezier(.4,0,.2,1);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .feature-card::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--hms-primary), var(--hms-accent));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .3s ease;
+  }
+  .feature-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--hms-shadow-lg);
+    border-color: transparent;
+  }
+  .feature-card:hover::after { transform: scaleX(1); }
+  .feature-icon-wrap {
+    width: 70px; height: 70px;
+    border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem;
+    margin-bottom: 1.3rem;
+    transition: transform .25s;
+  }
+  .feature-card:hover .feature-icon-wrap { transform: scale(1.08) rotate(-3deg); }
+  .icon-blue  { background: rgba(10,92,153,.1);  color: var(--hms-primary); }
+  .icon-teal  { background: rgba(0,180,216,.1);  color: var(--hms-accent);  }
+  .icon-green { background: rgba(34,197,94,.1);  color: var(--hms-success); }
+  .feature-card h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.15rem; font-weight: 700;
+    margin-bottom: .55rem;
+  }
+  .feature-card p {
+    font-size: .88rem; color: var(--hms-muted);
+    line-height: 1.65; margin-bottom: 1.5rem;
+  }
+
+  /* ── TRUST STRIP ────────────────────────────────────────────── */
+  .trust-strip {
+    background: var(--hms-card);
+    border-top: 1px solid var(--hms-border);
+    border-bottom: 1px solid var(--hms-border);
+    padding: 2.2rem 0;
+  }
+  .trust-item {
+    display: flex; flex-direction: column; align-items: center;
+    gap: .3rem; color: var(--hms-muted); font-size: .82rem;
+  }
+  .trust-item i { font-size: 1.6rem; color: var(--hms-primary); }
+  .trust-item strong { font-family: 'Syne',sans-serif; font-size: 1.1rem; color: var(--hms-text); }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ═══════════════ HERO ══════════════════════════════════════ -->
+<section class="hero-section">
+  <div class="hero-blob"></div>
+  <div class="hero-blob2"></div>
+  <div class="container">
+    <div class="row align-items-center gy-4">
+
+      <!-- Left: Text -->
+      <div class="col-lg-6 fade-up">
+        <div class="hero-badge">
+          <i class="bi bi-shield-check-fill"></i>
+          Trusted Healthcare Platform
+        </div>
+        <h1 class="hero-title">
+          Modern Care,<br><span>Smarter Management</span>
+        </h1>
+        <p class="hero-sub">
+          Streamline your hospital's operations with our all-in-one management platform. Book appointments, manage doctors, and track patient care — all in one place.
+        </p>
+        <div class="hero-cta-row">
+          <a href="{% url 'book_appointment' %}" class="btn-hero-primary">
+            <i class="bi bi-calendar2-plus"></i> Book Appointment
+          </a>
+          <a href="{% url 'doctor_list' %}" class="btn-hero-ghost">
+            <i class="bi bi-person-badge"></i> Meet Our Doctors
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat-item">
+            <span class="hero-stat-num">50+</span>
+            <span class="hero-stat-lbl">Specialist Doctors</span>
+          </div>
+          <div class="hero-stat-item">
+            <span class="hero-stat-num">10k+</span>
+            <span class="hero-stat-lbl">Patients Served</span>
+          </div>
+          <div class="hero-stat-item">
+            <span class="hero-stat-num">24/7</span>
+            <span class="hero-stat-lbl">Support Available</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Illustration card -->
+      <div class="col-lg-6 hero-visual fade-up fade-up-d2">
+        <div class="hero-illustration">
+          <div class="hero-ill-header">
+            <div class="hero-ill-avatar"><i class="bi bi-clipboard2-pulse"></i></div>
+            <div>
+              <div class="hero-ill-title">Today's Schedule</div>
+              <div class="hero-ill-sub">3 appointments pending</div>
+            </div>
+          </div>
+          <div class="hero-ill-row">
+            <span class="hero-ill-dot dot-green"></span>
+            <i class="bi bi-person-circle"></i>
+            <span style="flex:1">Dr. Sarah Khan — 09:00 AM</span>
+            <span style="font-size:.72rem;opacity:.7">Cardiology</span>
+          </div>
+          <div class="hero-ill-row">
+            <span class="hero-ill-dot dot-yellow"></span>
+            <i class="bi bi-person-circle"></i>
+            <span style="flex:1">Dr. Arjun Mehta — 11:30 AM</span>
+            <span style="font-size:.72rem;opacity:.7">Neurology</span>
+          </div>
+          <div class="hero-ill-row">
+            <span class="hero-ill-dot dot-blue"></span>
+            <i class="bi bi-person-circle"></i>
+            <span style="flex:1">Dr. Priya Patel — 02:00 PM</span>
+            <span style="font-size:.72rem;opacity:.7">Pediatrics</span>
+          </div>
+          <div style="text-align:right;margin-top:1rem;font-size:.78rem;opacity:.6;">
+            <i class="bi bi-clock"></i> Updated just now
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ TRUST STRIP ═══════════════════════════════ -->
+<div class="trust-strip">
+  <div class="container">
+    <div class="row g-3 text-center">
+      <div class="col-6 col-md-3">
+        <div class="trust-item">
+          <i class="bi bi-shield-fill-check"></i>
+          <strong>HIPAA Compliant</strong>
+          <span>Data Security</span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="trust-item">
+          <i class="bi bi-clock-history"></i>
+          <strong>24/7 Access</strong>
+          <span>Always Available</span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="trust-item">
+          <i class="bi bi-people-fill"></i>
+          <strong>Multi-Role</strong>
+          <span>Admin · Doctor · Patient</span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="trust-item">
+          <i class="bi bi-graph-up-arrow"></i>
+          <strong>Real-Time</strong>
+          <span>Live Dashboard</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ FEATURE CARDS ═════════════════════════════ -->
+<section class="features-section">
+  <div class="container">
+
+    <div class="text-center mb-5 fade-up">
+      <p class="section-eyebrow">Explore the system</p>
+      <h2 class="section-title">Everything You Need in One Place</h2>
+      <p style="color:var(--hms-muted);max-width:480px;margin:0 auto;font-size:.95rem;">
+        From booking to billing, manage every aspect of your hospital with our intuitive modules.
+      </p>
+    </div>
+
+    <div class="row g-4">
+
+      <!-- Card 1: Doctors -->
+      <div class="col-md-4 fade-up fade-up-d1">
+        <a href="{% url 'doctor_list' %}" class="text-decoration-none">
+          <div class="feature-card">
+            <div class="feature-icon-wrap icon-blue">
+              <i class="bi bi-person-badge-fill"></i>
+            </div>
+            <h4>Our Specialists</h4>
+            <p>Explore our team of certified specialists across cardiology, neurology, pediatrics, and 20+ other departments.</p>
+            <span class="btn-hms-primary" style="font-size:.83rem;padding:.5rem 1.1rem;">
+              View Doctors <i class="bi bi-arrow-right"></i>
+            </span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Card 2: Appointments -->
+      <div class="col-md-4 fade-up fade-up-d2">
+        <a href="{% url 'book_appointment' %}" class="text-decoration-none">
+          <div class="feature-card">
+            <div class="feature-icon-wrap icon-teal">
+              <i class="bi bi-calendar2-heart-fill"></i>
+            </div>
+            <h4>Book Appointment</h4>
+            <p>Schedule a consultation with any of our doctors in under 60 seconds. Choose your date, time, and specialist.</p>
+            <span class="btn-hms-primary" style="font-size:.83rem;padding:.5rem 1.1rem;background:linear-gradient(135deg,var(--hms-accent),#0077B6)">
+              Book Now <i class="bi bi-arrow-right"></i>
+            </span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Card 3: Dashboard -->
+      <div class="col-md-4 fade-up fade-up-d3">
+        <a href="{% url 'dashboard' %}" class="text-decoration-none">
+          <div class="feature-card">
+            <div class="feature-icon-wrap icon-green">
+              <i class="bi bi-grid-1x2-fill"></i>
+            </div>
+            <h4>Your Dashboard</h4>
+            <p>Get a bird's-eye view of all appointments, patient records, and reports tailored to your role in the system.</p>
+            <span class="btn-hms-primary" style="font-size:.83rem;padding:.5rem 1.1rem;background:linear-gradient(135deg,var(--hms-success),#15803D)">
+              Open Dashboard <i class="bi bi-arrow-right"></i>
+            </span>
+          </div>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}

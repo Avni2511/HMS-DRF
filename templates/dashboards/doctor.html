@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% block title %}Doctor Dashboard — HMS{% endblock %}
+
+{% block content %}
+<div class="hms-layout">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="hms-sidebar">
+    <div class="nav-user-pill mb-3">
+      <div class="nav-avatar">{{ user.username|first|upper }}</div>
+      <span style="font-size:.8rem">Dr. {{ user.username }}</span>
+    </div>
+    <div class="sidebar-section-label">Doctor Panel</div>
+    <a href="#"                            class="sidebar-link active"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a href="{% url 'appointment_list' %}" class="sidebar-link"><i class="bi bi-calendar2-check"></i> My Appointments</a>
+    <a href="{% url 'doctor_list' %}"      class="sidebar-link"><i class="bi bi-person-badge"></i> Colleagues</a>
+    <div class="sidebar-section-label">Account</div>
+    <a href="#"                 class="sidebar-link"><i class="bi bi-person-circle"></i> Profile</a>
+    <a href="{% url 'logout' %}" class="sidebar-link" style="color:var(--hms-danger)">
+      <i class="bi bi-box-arrow-right"></i> Logout
+    </a>
+  </aside>
+
+  <!-- ── MAIN CONTENT ── -->
+  <main class="hms-content">
+
+    <!-- Header -->
+    <div class="page-header fade-up">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+          <p class="section-eyebrow mb-1">Doctor Portal</p>
+          <h1>Welcome, Dr. {{ user.username }}</h1>
+          <p>Here are your scheduled appointments for today and upcoming days.</p>
+        </div>
+        <div class="d-flex gap-2 align-items-center">
+          <!-- Profile pill -->
+          <div style="display:flex;align-items:center;gap:.6rem;background:var(--hms-card);border:1px solid var(--hms-border);border-radius:50px;padding:.4rem .9rem .4rem .4rem;">
+            <div class="nav-avatar" style="width:34px;height:34px;font-size:.85rem">
+              {{ user.username|first|upper }}
+            </div>
+            <div>
+              <div style="font-size:.8rem;font-weight:700;line-height:1.1">Dr. {{ user.username }}</div>
+              <div style="font-size:.7rem;color:var(--hms-muted)">
+                {{ doctor.specialization|default:"Specialist" }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stat row -->
+    <div class="row g-3 mb-4">
+      <div class="col-sm-4 fade-up fade-up-d1">
+        <div class="stat-card blue">
+          <div class="stat-icon blue"><i class="bi bi-calendar2-check-fill"></i></div>
+          <div>
+            <div class="stat-value">{{ appointments|length }}</div>
+            <div class="stat-label">Total Appointments</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-4 fade-up fade-up-d2">
+        <div class="stat-card green">
+          <div class="stat-icon green"><i class="bi bi-check2-circle"></i></div>
+          <div>
+            <div class="stat-value">
+              {{ approved_count }}
+            </div>
+            <div class="stat-label">Approved</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-4 fade-up fade-up-d3">
+        <div class="stat-card amber">
+          <div class="stat-icon amber"><i class="bi bi-hourglass-split"></i></div>
+          <div>
+            <div class="stat-value">
+              {{ pending_count  }}
+            </div>
+            <div class="stat-label">Pending</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Appointment Table -->
+    <div class="hms-card p-0 overflow-hidden fade-up fade-up-d2">
+      <div class="p-4 pb-0">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div>
+            <h5 style="font-family:'Syne',sans-serif;font-weight:700;margin:0">
+              <i class="bi bi-calendar2-week text-primary me-2"></i>My Appointments
+            </h5>
+            <p style="font-size:.82rem;color:var(--hms-muted);margin:.2rem 0 0">
+              Manage and track your patient appointments
+            </p>
+          </div>
+          <a href="{% url 'appointment_list' %}" class="btn-hms-outline" style="font-size:.78rem;padding:.35rem .85rem">
+            View All <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="hms-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Patient</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for appt in appointments %}
+            <tr>
+              <td style="color:var(--hms-muted);font-size:.8rem">{{ forloop.counter }}</td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="nav-avatar" style="width:30px;height:30px;font-size:.72rem">
+                    {{ appt.patient.user.username|first|upper }}
+                  </div>
+                  <div>
+                    <div style="font-weight:600;font-size:.88rem">{{ appt.patient.user.username }}</div>
+                    <div style="font-size:.74rem;color:var(--hms-muted)">Patient</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="d-flex align-items-center gap-1">
+                  <i class="bi bi-calendar3 text-muted" style="font-size:.85rem"></i>
+                  <span>{{ appt.date }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="d-flex align-items-center gap-1">
+                  <i class="bi bi-clock text-muted" style="font-size:.85rem"></i>
+                  <span>{{ appt.time }}</span>
+                </div>
+              </td>
+              <td>
+                {% if appt.status == 'Approved' %}
+                  <span class="hms-badge badge-approved">
+                    <i class="bi bi-check-circle-fill me-1"></i>Approved
+                  </span>
+                {% elif appt.status == 'Pending' %}
+                  <span class="hms-badge badge-pending">
+                    <i class="bi bi-hourglass-split me-1"></i>Pending
+                  </span>
+                {% else %}
+                  <span class="hms-badge badge-cancelled">
+                    <i class="bi bi-x-circle-fill me-1"></i>Cancelled
+                  </span>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5">
+                <div class="empty-state">
+                  <div class="empty-icon"><i class="bi bi-calendar2-x"></i></div>
+                  <h6>No appointments scheduled</h6>
+                  <p>Patient appointments assigned to you will appear here.</p>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+{% endblock %}

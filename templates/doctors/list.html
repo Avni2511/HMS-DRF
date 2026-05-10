@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+{% block title %}Our Doctors — HMS{% endblock %}
+
+{% block extra_head %}
+<style>
+  .doctor-card {
+    background: var(--hms-card);
+    border: 1px solid var(--hms-border);
+    border-radius: var(--hms-radius);
+    box-shadow: var(--hms-shadow-sm);
+    overflow: hidden;
+    transition: all .3s cubic-bezier(.4,0,.2,1);
+    height: 100%;
+    display: flex; flex-direction: column;
+  }
+  .doctor-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--hms-shadow-lg);
+    border-color: rgba(10,92,153,.2);
+  }
+  .doctor-card-header {
+    padding: 2rem 1.5rem 1.2rem;
+    text-align: center;
+    background: linear-gradient(160deg, rgba(10,92,153,.05) 0%, rgba(0,180,216,.06) 100%);
+    border-bottom: 1px solid var(--hms-border);
+    position: relative;
+  }
+  /* Colored stripe per card (cycles through colors) */
+  .doctor-card-header::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 4px;
+  }
+  .doctor-card:nth-child(3n+1) .doctor-card-header::before { background: linear-gradient(90deg,var(--hms-primary),var(--hms-accent)); }
+  .doctor-card:nth-child(3n+2) .doctor-card-header::before { background: linear-gradient(90deg,var(--hms-success),var(--hms-accent)); }
+  .doctor-card:nth-child(3n+3) .doctor-card-header::before { background: linear-gradient(90deg,var(--hms-warning),var(--hms-danger)); }
+
+  .doctor-avatar {
+    width: 88px; height: 88px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #fff;
+    box-shadow: 0 4px 16px rgba(10,92,153,.15);
+    display: block; margin: 0 auto .85rem;
+  }
+  .doctor-avatar-placeholder {
+    width: 88px; height: 88px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--hms-primary), var(--hms-accent));
+    border: 3px solid #fff;
+    box-shadow: 0 4px 16px rgba(10,92,153,.2);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne',sans-serif;
+    font-size: 2rem; font-weight: 800; color: #fff;
+    margin: 0 auto .85rem;
+  }
+  .doctor-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.05rem; font-weight: 700;
+    color: var(--hms-text); margin-bottom: .25rem;
+  }
+  .doctor-spec {
+    display: inline-flex; align-items: center; gap: .3rem;
+    background: rgba(10,92,153,.08);
+    color: var(--hms-primary);
+    padding: .25rem .7rem;
+    border-radius: 50px;
+    font-size: .75rem; font-weight: 600;
+  }
+  .doctor-card-body {
+    padding: 1.2rem 1.5rem;
+    flex: 1; display: flex; flex-direction: column; gap: .6rem;
+  }
+  .doctor-info-row {
+    display: flex; align-items: center; gap: .55rem;
+    font-size: .84rem; color: var(--hms-muted);
+  }
+  .doctor-info-row i { color: var(--hms-primary); font-size: .95rem; width: 16px; flex-shrink: 0; }
+  .doctor-card-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--hms-border);
+  }
+  .btn-book {
+    width: 100%;
+    background: linear-gradient(135deg, var(--hms-primary), var(--hms-accent));
+    color: #fff; border: none;
+    border-radius: 10px;
+    padding: .6rem 1rem;
+    font-weight: 600; font-size: .87rem;
+    transition: all .25s;
+    display: flex; align-items: center; justify-content: center; gap: .4rem;
+  }
+  .btn-book:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(10,92,153,.3);
+    color: #fff;
+  }
+
+  /* Search bar */
+  .search-wrap {
+    position: relative; max-width: 380px;
+  }
+  .search-wrap .bi-search {
+    position: absolute; left: .9rem; top: 50%; transform: translateY(-50%);
+    color: var(--hms-muted); pointer-events: none;
+  }
+  .search-input {
+    border: 1.5px solid var(--hms-border);
+    border-radius: 10px;
+    padding: .55rem 1rem .55rem 2.4rem;
+    font-size: .88rem;
+    background: #fff;
+    width: 100%;
+    transition: border-color .2s, box-shadow .2s;
+    color: var(--hms-text);
+  }
+  .search-input:focus {
+    outline: none;
+    border-color: var(--hms-accent);
+    box-shadow: 0 0 0 3px rgba(0,180,216,.13);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Page Header -->
+  <div class="page-header fade-up">
+    <div class="d-flex align-items-start justify-content-between flex-wrap gap-3">
+      <div>
+        <p class="section-eyebrow mb-1">Medical Team</p>
+        <h1>Our Specialist Doctors</h1>
+        <p>Experienced professionals dedicated to your health and well-being.</p>
+      </div>
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <div class="search-wrap">
+          <i class="bi bi-search"></i>
+          <input type="text" class="search-input" id="doctorSearch" placeholder="Search doctors…">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Doctors Grid -->
+  <div class="row g-4" id="doctorGrid">
+    {% for doctor in doctors %}
+    <div class="col-sm-6 col-lg-4 doctor-item fade-up" style="animation-delay:{{ forloop.counter0 }}00ms">
+      <div class="doctor-card">
+
+        <!-- Card Header (Avatar + Name + Spec) -->
+        <div class="doctor-card-header">
+          {% if doctor.profile_pic %}
+            <img src="{{ doctor.profile_pic.url }}" alt="Dr. {{ doctor.user.username }}" class="doctor-avatar">
+          {% else %}
+            <div class="doctor-avatar-placeholder">
+              {{ doctor.user.username|first|upper }}
+            </div>
+          {% endif %}
+          <div class="doctor-name">Dr. {{ doctor.user.username }}</div>
+          <span class="doctor-spec">
+            <i class="bi bi-award-fill"></i>
+            {{ doctor.specialization|default:"General Practice" }}
+          </span>
+        </div>
+
+        <!-- Card Body -->
+        <div class="doctor-card-body">
+          {% if doctor.phone %}
+          <div class="doctor-info-row">
+            <i class="bi bi-telephone-fill"></i>
+            <span>{{ doctor.phone }}</span>
+          </div>
+          {% endif %}
+          {% if doctor.email %}
+          <div class="doctor-info-row">
+            <i class="bi bi-envelope-fill"></i>
+            <span>{{ doctor.email }}</span>
+          </div>
+          {% endif %}
+          {% if doctor.address %}
+          <div class="doctor-info-row">
+            <i class="bi bi-geo-alt-fill"></i>
+            <span>{{ doctor.address }}</span>
+          </div>
+          {% endif %}
+          <!-- Fallback: always show at least phone label -->
+          {% if not doctor.phone and not doctor.email and not doctor.address %}
+          <div class="doctor-info-row">
+            <i class="bi bi-hospital"></i>
+            <span>Available for consultation</span>
+          </div>
+          <div class="doctor-info-row">
+            <i class="bi bi-calendar2-check"></i>
+            <span>Online booking available</span>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Card Footer (CTA) -->
+        <div class="doctor-card-footer">
+          <a href="{% url 'book_appointment' %}?doctor={{ doctor.id }}" class="btn-book">
+            <i class="bi bi-calendar2-plus"></i>
+            Book Appointment
+          </a>
+        </div>
+
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+      <div class="empty-state hms-card py-5">
+        <div class="empty-icon"><i class="bi bi-person-badge"></i></div>
+        <h6>No doctors registered yet</h6>
+        <p>Our medical team will appear here once profiles are created.</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+
+{% block extra_js %}
+<script>
+  // Live search filter
+  const searchInput = document.getElementById('doctorSearch');
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      const q = this.value.toLowerCase();
+      document.querySelectorAll('.doctor-item').forEach(item => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = text.includes(q) ? '' : 'none';
+      });
+    });
+  }
+</script>
+{% endblock %}
+{% endblock %}

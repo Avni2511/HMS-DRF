@@ -1,0 +1,271 @@
+{% extends 'base.html' %}
+{% block title %}Appointments — HMS{% endblock %}
+
+{% block extra_head %}
+<style>
+  .filter-pill {
+    display: inline-flex; align-items: center; gap: .3rem;
+    padding: .35rem .9rem;
+    border-radius: 50px;
+    font-size: .78rem; font-weight: 600;
+    border: 1.5px solid var(--hms-border);
+    background: var(--hms-card);
+    color: var(--hms-muted);
+    cursor: pointer;
+    transition: all .2s;
+    user-select: none;
+  }
+  .filter-pill:hover,
+  .filter-pill.active {
+    background: var(--hms-primary);
+    border-color: var(--hms-primary);
+    color: #fff;
+  }
+  .filter-pill.all.active    { background:var(--hms-primary); border-color:var(--hms-primary); }
+  .filter-pill.pending.active  { background:#92400E; border-color:#92400E; }
+  .filter-pill.approved.active { background:#166534; border-color:#166534; }
+  .filter-pill.cancelled.active{ background:#991B1B; border-color:#991B1B; }
+
+  .appt-count {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 20px; height: 20px;
+    background: rgba(10,92,153,.1);
+    color: var(--hms-primary);
+    border-radius: 50px; font-size: .7rem; font-weight: 700;
+    padding: 0 5px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Page Header -->
+  <div class="page-header fade-up">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div>
+        <p class="section-eyebrow mb-1">Scheduling</p>
+        <h1>Appointments</h1>
+        <p>View and manage all scheduled appointments.</p>
+      </div>
+      <a href="{% url 'book_appointment' %}" class="btn-hms-primary">
+        <i class="bi bi-calendar2-plus"></i> Book New
+      </a>
+    </div>
+  </div>
+
+  <!-- Summary stat chips -->
+  <div class="d-flex gap-2 flex-wrap mb-3 fade-up fade-up-d1">
+    <button class="filter-pill all active" data-filter="all">
+      <i class="bi bi-calendar2-check"></i> All
+      <span class="appt-count" id="countAll">{{ appointments|length }}</span>
+    </button>
+    <button class="filter-pill approved" data-filter="Approved">
+      <i class="bi bi-check-circle"></i> Approved
+      <span class="appt-count" id="countApproved">—</span>
+    </button>
+    <button class="filter-pill pending" data-filter="Pending">
+      <i class="bi bi-hourglass-split"></i> Pending
+      <span class="appt-count" id="countPending">—</span>
+    </button>
+    <button class="filter-pill cancelled" data-filter="Cancelled">
+      <i class="bi bi-x-circle"></i> Cancelled
+      <span class="appt-count" id="countCancelled">—</span>
+    </button>
+  </div>
+
+  <!-- Table card -->
+  <div class="hms-card p-0 overflow-hidden fade-up fade-up-d2">
+
+    <!-- Card top bar -->
+    <div class="d-flex align-items-center justify-content-between p-4 pb-3 border-bottom">
+      <div>
+        <h5 style="font-family:'Syne',sans-serif;font-weight:700;margin:0">
+          <i class="bi bi-table text-primary me-2"></i>Appointment Records
+        </h5>
+      </div>
+      <!-- Search -->
+      <div style="position:relative;width:220px;">
+        <i class="bi bi-search" style="position:absolute;left:.75rem;top:50%;transform:translateY(-50%);color:var(--hms-muted);font-size:.85rem"></i>
+        <input type="text" id="apptSearch" placeholder="Search…"
+               style="border:1.5px solid var(--hms-border);border-radius:9px;padding:.45rem .9rem .45rem 2.1rem;font-size:.83rem;width:100%;color:var(--hms-text);background:#fff;transition:.2s"
+               onfocus="this.style.borderColor='var(--hms-accent)'"
+               onblur="this.style.borderColor='var(--hms-border)'">
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive">
+      <table class="hms-table" id="apptTable">
+        <thead>
+          <tr>
+            <th style="width:50px">#</th>
+            <th>Patient</th>
+            <th>Doctor</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="apptTbody">
+          {% for appt in appointments %}
+          <tr class="appt-row" data-status="{{ appt.status }}">
+            <td style="color:var(--hms-muted);font-size:.78rem;font-weight:600">
+              {{ forloop.counter }}
+            </td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <div class="nav-avatar" style="width:30px;height:30px;font-size:.7rem">
+                  {{ appt.patient.user.username|first|upper }}
+                </div>
+                <div>
+                  <div style="font-weight:600;font-size:.87rem">{{ appt.patient.user.username }}</div>
+                  <div style="font-size:.72rem;color:var(--hms-muted)">Patient</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <div class="nav-avatar" style="width:30px;height:30px;font-size:.7rem;background:linear-gradient(135deg,#0A5C99,#00B4D8)">
+                  {{ appt.doctor.user.username|first|upper }}
+                </div>
+                <div>
+                  <div style="font-weight:600;font-size:.87rem">Dr. {{ appt.doctor.user.username }}</div>
+                  <div style="font-size:.72rem;color:var(--hms-muted)">
+                    {{ appt.doctor.specialization|default:"Specialist" }}
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="d-flex align-items-center gap-1" style="font-size:.87rem">
+                <i class="bi bi-calendar3 text-muted"></i>
+                {{ appt.date }}
+              </div>
+            </td>
+            <td>
+              <div class="d-flex align-items-center gap-1" style="font-size:.87rem">
+                <i class="bi bi-clock text-muted"></i>
+                {{ appt.time }}
+              </div>
+            </td>
+            <td>
+              {% if appt.status == 'Approved' %}
+                <span class="hms-badge badge-approved">
+                  <i class="bi bi-check-circle-fill me-1"></i>Approved
+                </span>
+              {% elif appt.status == 'Pending' %}
+                <span class="hms-badge badge-pending">
+                  <i class="bi bi-hourglass-split me-1"></i>Pending
+                </span>
+              {% elif appt.status == 'Cancelled' %}
+                <span class="hms-badge badge-cancelled">
+                  <i class="bi bi-x-circle-fill me-1"></i>Cancelled
+                </span>
+              {% else %}
+                <span class="hms-badge" style="background:var(--hms-bg);color:var(--hms-muted)">
+                  {{ appt.status }}
+                </span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr id="emptyRow">
+            <td colspan="6">
+              <div class="empty-state">
+                <div class="empty-icon"><i class="bi bi-calendar2-x"></i></div>
+                <h6>No appointments found</h6>
+                <p>There are no appointments to display right now.</p>
+                <a href="{% url 'book_appointment' %}" class="btn-hms-primary" style="font-size:.85rem">
+                  <i class="bi bi-calendar2-plus"></i> Book First Appointment
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- No results row (JS-controlled) -->
+    <div id="noResults" style="display:none" class="py-4 text-center">
+      <div class="empty-icon mx-auto"><i class="bi bi-funnel-fill"></i></div>
+      <p style="color:var(--hms-muted);font-size:.88rem;margin-top:.75rem">
+        No appointments match your current filter.
+      </p>
+    </div>
+
+    <!-- Pagination placeholder -->
+    <div class="d-flex align-items-center justify-content-between px-4 py-3 border-top" style="font-size:.82rem;color:var(--hms-muted)">
+      <span id="showingLabel">Showing {{ appointments|length }} appointment{{ appointments|length|pluralize }}</span>
+      <div class="d-flex gap-1">
+        <button class="btn btn-sm btn-light rounded-3 border" disabled>
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <button class="btn btn-sm" style="background:var(--hms-primary);color:#fff;border-radius:6px;min-width:30px">1</button>
+        <button class="btn btn-sm btn-light rounded-3 border" disabled>
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const rows     = document.querySelectorAll('.appt-row');
+  const pills    = document.querySelectorAll('.filter-pill');
+  const search   = document.getElementById('apptSearch');
+  const noRes    = document.getElementById('noResults');
+  const showLbl  = document.getElementById('showingLabel');
+
+  // Count statuses
+  const counts = { Approved: 0, Pending: 0, Cancelled: 0 };
+  rows.forEach(r => {
+    const s = r.dataset.status;
+    if (counts[s] !== undefined) counts[s]++;
+  });
+  document.getElementById('countApproved').textContent  = counts.Approved;
+  document.getElementById('countPending').textContent   = counts.Pending;
+  document.getElementById('countCancelled').textContent = counts.Cancelled;
+
+  let activeFilter = 'all';
+  let searchQuery  = '';
+
+  function applyFilters() {
+    let visible = 0;
+    rows.forEach(row => {
+      const statusMatch = activeFilter === 'all' || row.dataset.status === activeFilter;
+      const searchMatch = searchQuery === '' || row.textContent.toLowerCase().includes(searchQuery);
+      if (statusMatch && searchMatch) {
+        row.style.display = '';
+        visible++;
+      } else {
+        row.style.display = 'none';
+      }
+    });
+    noRes.style.display = (visible === 0 && rows.length > 0) ? 'block' : 'none';
+    showLbl.textContent = `Showing ${visible} appointment${visible !== 1 ? 's' : ''}`;
+  }
+
+  pills.forEach(pill => {
+    pill.addEventListener('click', function () {
+      pills.forEach(p => p.classList.remove('active'));
+      this.classList.add('active');
+      activeFilter = this.dataset.filter;
+      applyFilters();
+    });
+  });
+
+  if (search) {
+    search.addEventListener('input', function () {
+      searchQuery = this.value.toLowerCase();
+      applyFilters();
+    });
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+{% block title %}Book Appointment — HMS{% endblock %}
+
+{% block extra_head %}
+<style>
+  .booking-section {
+    min-height: calc(100vh - 140px);
+    display: flex; align-items: center;
+    padding: 2.5rem 0;
+    background: var(--hms-bg);
+  }
+  /* Left: info panel */
+  .booking-info {
+    background: linear-gradient(155deg, var(--hms-primary-dk), var(--hms-primary) 55%, var(--hms-accent));
+    color: #fff;
+    border-radius: var(--hms-radius);
+    padding: 2.5rem 2rem;
+    height: 100%;
+  }
+  .booking-info h3 { font-family:'Syne',sans-serif; font-weight:800; font-size:1.5rem; margin-bottom:.5rem; }
+  .booking-info p  { font-size:.88rem; opacity:.85; line-height:1.6; }
+  .booking-info-step {
+    display: flex; align-items: flex-start; gap: .85rem;
+    margin-bottom: 1.2rem;
+  }
+  .step-num {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: rgba(255,255,255,.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .8rem; font-weight: 700; flex-shrink: 0;
+  }
+  .step-text strong { font-size: .88rem; display: block; margin-bottom: .1rem; }
+  .step-text span   { font-size: .78rem; opacity: .75; }
+
+  /* Right: Form card */
+  .booking-form-card {
+    background: var(--hms-card);
+    border: 1px solid var(--hms-border);
+    border-radius: var(--hms-radius);
+    box-shadow: var(--hms-shadow);
+    padding: 2.5rem;
+  }
+  .form-section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem; font-weight: 800;
+    color: var(--hms-text); margin-bottom: .3rem;
+  }
+  .form-section-sub { font-size: .88rem; color: var(--hms-muted); margin-bottom: 1.8rem; }
+
+  /* Custom select */
+  .hms-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748B' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+  }
+
+  /* Input icon wrapper */
+  .input-icon-wrap { position: relative; }
+  .input-icon-wrap .input-icon {
+    position: absolute; left: .9rem; top: 50%; transform: translateY(-50%);
+    color: var(--hms-muted); pointer-events: none; font-size: .95rem;
+  }
+  .input-icon-wrap .hms-form-control { padding-left: 2.4rem; }
+
+  /* Doctor option card (radio-style) -->
+  .doctor-option-row {
+    display: flex; align-items: center; gap: .6rem;
+    padding: .55rem .75rem;
+    border: 1.5px solid var(--hms-border);
+    border-radius: 9px;
+    cursor: pointer;
+    transition: all .2s;
+    margin-bottom: .4rem;
+    font-size: .87rem;
+  }
+  .doctor-option-row:hover { border-color: var(--hms-accent); background: rgba(0,180,216,.04); }
+
+  /* Submit btn */
+  .btn-submit {
+    width: 100%;
+    background: linear-gradient(135deg, var(--hms-primary), var(--hms-accent));
+    color: #fff; border: none;
+    border-radius: 12px;
+    padding: .85rem 1.5rem;
+    font-weight: 700; font-size: .97rem;
+    box-shadow: 0 4px 16px rgba(10,92,153,.25);
+    transition: all .25s;
+    display: flex; align-items: center; justify-content: center; gap: .5rem;
+    margin-top: .5rem;
+  }
+  .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(10,92,153,.35);
+    color: #fff;
+  }
+  .btn-submit:active { transform: scale(.98); }
+
+  /* Availability note */
+  .avail-note {
+    background: rgba(34,197,94,.07);
+    border: 1px solid rgba(34,197,94,.2);
+    border-radius: 9px;
+    padding: .7rem 1rem;
+    font-size: .8rem;
+    color: #166534;
+    display: flex; align-items: center; gap: .5rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="booking-section">
+  <div class="container">
+    <div class="row g-4 justify-content-center">
+
+      <!-- Left panel (desktop only) -->
+      <div class="col-lg-4 d-none d-lg-block fade-up">
+        <div class="booking-info">
+          <div class="mb-3">
+            <span style="font-size:.72rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;opacity:.65">
+              Quick &amp; Easy
+            </span>
+          </div>
+          <h3>Book Your Appointment</h3>
+          <p>Schedule a consultation with our specialists in just 3 easy steps. We'll confirm your booking shortly.</p>
+
+          <hr style="border-color:rgba(255,255,255,.15);margin:1.5rem 0">
+
+          <div class="booking-info-step">
+            <div class="step-num">1</div>
+            <div class="step-text">
+              <strong>Choose Doctor</strong>
+              <span>Select your preferred specialist from our medical team.</span>
+            </div>
+          </div>
+          <div class="booking-info-step">
+            <div class="step-num">2</div>
+            <div class="step-text">
+              <strong>Pick Date &amp; Time</strong>
+              <span>Choose a date and time that fits your schedule.</span>
+            </div>
+          </div>
+          <div class="booking-info-step">
+            <div class="step-num">3</div>
+            <div class="step-text">
+              <strong>Confirm</strong>
+              <span>Submit and wait for the doctor's confirmation.</span>
+            </div>
+          </div>
+
+          <hr style="border-color:rgba(255,255,255,.15);margin:1.5rem 0">
+
+          <div style="display:flex;align-items:center;gap:.6rem;font-size:.8rem;opacity:.75">
+            <i class="bi bi-shield-check-fill"></i>
+            Your data is secure and private.
+          </div>
+        </div>
+      </div>
+
+      <!-- Form card -->
+      <div class="col-lg-8 col-xl-7 fade-up fade-up-d1">
+        <div class="booking-form-card">
+
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--hms-primary),var(--hms-accent));display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.3rem;">
+              <i class="bi bi-calendar2-heart-fill"></i>
+            </div>
+            <div>
+              <div class="form-section-title" style="margin-bottom:0">Book Appointment</div>
+              <div class="form-section-sub" style="margin-bottom:0">Fill in the details below</div>
+            </div>
+          </div>
+
+          {% if messages %}
+            {% for message in messages %}
+              <div class="hms-alert alert alert-{{ message.tags }} alert-dismissible fade show mb-3" role="alert">
+                {{ message }} <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+
+          <form method="post" action="{% url 'book_appointment' %}">
+            {% csrf_token %}
+
+            <!-- Doctor -->
+            <div class="mb-4">
+              <label class="hms-label" for="doctor">
+                <i class="bi bi-person-badge me-1"></i> Select Doctor
+              </label>
+              <div class="input-icon-wrap">
+                <i class="bi bi-person-badge input-icon"></i>
+                <select name="doctor" id="doctor" class="hms-form-control hms-select" required>
+                  <option value="" disabled selected>Choose a specialist…</option>
+                  {% for doctor in doctors %}
+                    <option value="{{ doctor.id }}"
+                      {% if request.GET.doctor == doctor.id|stringformat:"s" %}selected{% endif %}>
+                      Dr. {{ doctor.user.username }}
+                      {% if doctor.specialization %} — {{ doctor.specialization }}{% endif %}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <!-- Date & Time row -->
+            <div class="row g-3 mb-4">
+              <div class="col-sm-6">
+                <label class="hms-label" for="date">
+                  <i class="bi bi-calendar3 me-1"></i> Appointment Date
+                </label>
+                <div class="input-icon-wrap">
+                  <i class="bi bi-calendar3 input-icon"></i>
+                  <input type="date" name="date" id="date"
+                         class="hms-form-control"
+                         min="{% now 'Y-m-d' %}"
+                         required>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <label class="hms-label" for="time">
+                  <i class="bi bi-clock me-1"></i> Preferred Time
+                </label>
+                <div class="input-icon-wrap">
+                  <i class="bi bi-clock input-icon"></i>
+                  <input type="time" name="time" id="time"
+                         class="hms-form-control"
+                         required>
+                </div>
+              </div>
+            </div>
+
+            <!-- Availability note -->
+            <div class="avail-note mb-4">
+              <i class="bi bi-info-circle-fill"></i>
+              Appointments are confirmed by the doctor. Please arrive 10 minutes early.
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" class="btn-submit">
+              <i class="bi bi-calendar2-check-fill"></i>
+              Confirm Appointment
+            </button>
+
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Set minimum date to today
+  const dateInput = document.getElementById('date');
+  if (dateInput && !dateInput.value) {
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.min = today;
+  }
+</script>
+{% endblock %}
