@@ -3,10 +3,12 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-
+from django.core.mail import send_mail
+from django.conf import settings
 from doctors.models import Doctor
 from patients.models import Patient
 from appointments.models import Appointment
+from doctors.models import DoctorAvailability
 
 User = get_user_model()
 
@@ -53,49 +55,79 @@ def logout_view(request):
 # REGISTER VIEW
 # PATIENT SELF REGISTRATION
 # =========================
+from django.db import IntegrityError
+
 def register_view(request):
 
     if request.method == 'POST':
 
-        username = request.POST.get('username')
+        username = request.POST.get('username', '').strip()
+        email = request.POST.get('email', '').strip().lower()
         password = request.POST.get('password')
 
         age = request.POST.get('age')
         gender = request.POST.get('gender')
 
-        # check username exists
-        if User.objects.filter(username=username).exists():
+        print("USERNAME =", username)
+        print("EMAIL =", email)
 
-            messages.error(request, 'Username already exists')
+        # Username already exists
+        if User.objects.filter(username__iexact=username).exists():
+
+            messages.error(
+                request,
+                'Username already exists'
+            )
 
             return redirect('register')
 
-        # create user
-        user = User.objects.create_user(
+        # Email already exists
+        if User.objects.filter(email__iexact=email).exists():
 
-            username=username,
-            password=password,
-            role='patient'
-        )
+            messages.error(
+                request,
+                'Email already exists'
+            )
 
-        # create patient profile
-        Patient.objects.create(
+            return redirect('register')
 
-            user=user,
-            age=age,
-            gender=gender
-        )
+        try:
 
-        messages.success(
-            request,
-            'Patient Registered Successfully'
-        )
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password,
+                role='patient'
+            )
 
-        return redirect('login')
+            Patient.objects.create(
+                user=user,
+                age=age,
+                gender=gender
+            )
 
-    return render(request, 'register.html')
+            messages.success(
+                request,
+                'Patient Registered Successfully'
+            )
 
+            return redirect('login')
 
+        except IntegrityError as e:
+
+            print("INTEGRITY ERROR =", e)
+
+            messages.error(
+                request,
+                'Username or Email already exists'
+            )
+
+            return redirect('register')
+
+    return render(
+        request,
+        'register.html'
+    )
 # =========================
 # HOME VIEW
 # =========================
@@ -301,6 +333,8 @@ def book_appointment(request):
 
     doctors = Doctor.objects.all()
 
+    availability = DoctorAvailability.objects.all()
+
     if request.method == 'POST':
 
         doctor_id = request.POST.get('doctor')
@@ -309,17 +343,49 @@ def book_appointment(request):
 
         time = request.POST.get('time')
 
-        doctor = Doctor.objects.get(id=doctor_id)
+        doctor = Doctor.objects.get(
+            id=doctor_id
+        )
 
-        patient = Patient.objects.get(user=request.user)
+        patient = Patient.objects.get(
+            user=request.user
+        )
 
-        Appointment.objects.create(
+        appointment = Appointment.objects.create(
 
             doctor=doctor,
             patient=patient,
             date=date,
             time=time,
             status='Pending'
+        )
+
+        # EMAIL NOTIFICATION
+        send_mail(
+
+            subject='Appointment Booked Successfully',
+
+            message=f'''
+Hello {request.user.username},
+
+Your appointment has been booked successfully.
+
+Doctor: Dr. {doctor.user.username}
+
+Date: {date}
+
+Time: {time}
+
+Status: Pending
+
+Thank you.
+            ''',
+
+            from_email=settings.EMAIL_HOST_USER,
+
+            recipient_list=[request.user.email],
+
+            fail_silently=False
         )
 
         messages.success(
@@ -331,7 +397,8 @@ def book_appointment(request):
 
     context = {
 
-        'doctors': doctors
+        'doctors': doctors,
+        'availability': availability
     }
 
     return render(
@@ -339,3 +406,86 @@ def book_appointment(request):
         'appointments/book.html',
         context
     )
+@login_required
+def approve_appointment(request, appointment_id):
+
+    if request.user.role not in ['admin', 'doctor']:
+
+        messages.error(
+            request,
+            'Permission Denied'
+        )
+
+        return redirect('dashboard')
+
+    appointment = Appointment.objects.get(
+        id=appointment_id
+    )
+
+    if request.user.role == 'doctor':
+
+        doctor = Doctor.objects.get(
+            user=request.user
+        )
+
+        if appointment.doctor != doctor:
+
+            messages.error(
+                request,
+                'Permission Denied'
+            )
+
+            return redirect('appointment_list')
+
+    appointment.status = 'Approved'
+    appointment.save()
+
+    messages.success(
+        request,
+        'Appointment Approved Successfully'
+    )
+
+    return redirect('appointment_list')
+
+@login_required
+def cancel_appointment(request, appointment_id):
+
+    if request.user.role not in ['admin', 'doctor']:
+
+        messages.error(
+            request,
+            'Permission Denied'
+        )
+
+        return redirect('dashboard')
+
+    appointment = Appointment.objects.get(
+        id=appointment_id
+    )
+
+    # Doctor can cancel only their own appointments
+    if request.user.role == 'doctor':
+
+        doctor = Doctor.objects.get(
+            user=request.user
+        )
+
+        if appointment.doctor != doctor:
+
+            messages.error(
+                request,
+                'Permission Denied'
+            )
+
+            return redirect('appointment_list')
+
+    appointment.status = 'Cancelled'
+
+    appointment.save()
+
+    messages.success(
+        request,
+        'Appointment Cancelled Successfully'
+    )
+
+    return redirect('appointment_list')

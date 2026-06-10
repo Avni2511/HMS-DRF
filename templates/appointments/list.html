@@ -105,6 +105,7 @@
             <th>Date</th>
             <th>Time</th>
             <th>Status</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody id="apptTbody">
@@ -149,29 +150,77 @@
                 {{ appt.time }}
               </div>
             </td>
-            <td>
-              {% if appt.status == 'Approved' %}
-                <span class="hms-badge badge-approved">
-                  <i class="bi bi-check-circle-fill me-1"></i>Approved
-                </span>
-              {% elif appt.status == 'Pending' %}
-                <span class="hms-badge badge-pending">
-                  <i class="bi bi-hourglass-split me-1"></i>Pending
-                </span>
-              {% elif appt.status == 'Cancelled' %}
-                <span class="hms-badge badge-cancelled">
-                  <i class="bi bi-x-circle-fill me-1"></i>Cancelled
-                </span>
-              {% else %}
-                <span class="hms-badge" style="background:var(--hms-bg);color:var(--hms-muted)">
-                  {{ appt.status }}
-                </span>
-              {% endif %}
-            </td>
+           <td>
+  {% if appt.status == 'Approved' %}
+    <span class="hms-badge badge-approved">
+      <i class="bi bi-check-circle-fill me-1"></i>Approved
+    </span>
+
+  {% elif appt.status == 'Pending' %}
+    <span class="hms-badge badge-pending">
+      <i class="bi bi-hourglass-split me-1"></i>Pending
+    </span>
+
+  {% elif appt.status == 'Cancelled' %}
+    <span class="hms-badge badge-cancelled">
+      <i class="bi bi-x-circle-fill me-1"></i>Cancelled
+    </span>
+
+  {% else %}
+    <span class="hms-badge"
+          style="background:var(--hms-bg);color:var(--hms-muted)">
+      {{ appt.status }}
+    </span>
+  {% endif %}
+</td>
+
+<td>
+
+  {% if request.user.role == 'doctor' or request.user.role == 'admin' %}
+
+      {% if appt.status == 'Pending' %}
+
+          <div class="d-flex gap-1">
+
+              <a href="{% url 'approve_appointment' appt.id %}"
+                 class="btn btn-success btn-sm">
+
+                  <i class="bi bi-check-circle"></i>
+                  Approve
+
+              </a>
+
+              <a href="{% url 'cancel_appointment' appt.id %}"
+                 class="btn btn-danger btn-sm">
+
+                  <i class="bi bi-x-circle"></i>
+                  Cancel
+
+              </a>
+
+          </div>
+
+      {% else %}
+
+          <span style="color:var(--hms-muted);font-size:.8rem;">
+              No Action
+          </span>
+
+      {% endif %}
+
+  {% else %}
+
+      <span style="color:var(--hms-muted);font-size:.8rem;">
+          —
+      </span>
+
+  {% endif %}
+
+</td>
           </tr>
           {% empty %}
           <tr id="emptyRow">
-            <td colspan="6">
+            <td colspan="7">
               <div class="empty-state">
                 <div class="empty-icon"><i class="bi bi-calendar2-x"></i></div>
                 <h6>No appointments found</h6>

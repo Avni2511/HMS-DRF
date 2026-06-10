@@ -12,7 +12,7 @@ urlpatterns = [
     # DASHBOARD
     path('', dashboard, name='dashboard'),
 
-   path('logout/', logout_view, name='logout'),
+    path('logout/', logout_view, name='logout'),
     # HOME
     path('home/', home, name='home'),
 
@@ -24,4 +24,16 @@ urlpatterns = [
 
     # BOOK APPOINTMENT
     path('appointments/book/', book_appointment, name='book_appointment'),
+
+    path(
+    'appointment/<int:appointment_id>/approve/',
+    approve_appointment,
+    name='approve_appointment'
+),
+
+    path(
+    'appointment/<int:appointment_id>/cancel/',
+    cancel_appointment,
+    name='cancel_appointment'
+),
 ]
