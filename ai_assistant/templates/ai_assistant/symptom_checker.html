@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <div class="card p-4">
+
+        <h2>
+            AI Symptom Checker
+        </h2>
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <label>
+                Enter Symptoms
+            </label>
+
+            <textarea
+                name="symptoms"
+                class="form-control"
+                rows="5"
+                required>
+            </textarea>
+
+            <br>
+
+            <button
+                class="btn btn-primary">
+
+                Analyze Symptoms
+
+            </button>
+
+        </form>
+
+        {% if result %}
+
+            <hr>
+
+            <h4>
+                AI Analysis
+            </h4>
+
+            <pre>
+{{ result }}
+            </pre>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

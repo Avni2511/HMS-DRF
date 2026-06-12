@@ -5,6 +5,7 @@ from rest_framework.routers import DefaultRouter
 from doctors.views import DoctorViewSet
 from patients.views import PatientViewSet
 from appointments.views import AppointmentViewSet
+from django.urls import include
 
 # DRF ROUTER
 router = DefaultRouter()
@@ -31,4 +32,12 @@ urlpatterns = [
 
     # DRF API
     path('api/', include(router.urls)),
+    path(
+    'prescriptions/',
+    include('prescriptions.urls')
+),
+path(
+    'ai/',
+    include('ai_assistant.urls')
+),
 ]

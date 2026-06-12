@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">
+        My Prescriptions
+    </h2>
+
+    {% for prescription in prescriptions %}
+
+        <div class="card mb-3 shadow-sm">
+
+            <div class="card-body">
+
+                <h5>
+                    Dr.
+                    {{ prescription.appointment.doctor.user.username }}
+                </h5>
+
+                <p>
+                    <strong>Date:</strong>
+                    {{ prescription.appointment.date }}
+                </p>
+
+                <p>
+                    <strong>Diagnosis:</strong><br>
+                    {{ prescription.diagnosis }}
+                </p>
+
+                <p>
+                    <strong>Medicines:</strong><br>
+                    {{ prescription.medicines }}
+                </p>
+
+                <p>
+                    <strong>Notes:</strong><br>
+                    {{ prescription.notes }}
+                </p>
+
+            </div>
+
+        </div>
+
+    {% empty %}
+
+        <div class="alert alert-info">
+
+            No prescriptions available.
+
+        </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

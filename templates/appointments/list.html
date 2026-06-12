@@ -105,6 +105,7 @@
             <th>Date</th>
             <th>Time</th>
             <th>Status</th>
+            <th>Prescription</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -217,10 +218,31 @@
   {% endif %}
 
 </td>
+<td>
+
+    {% if request.user.role == 'doctor' %}
+
+        <a href="{% url 'add_prescription' appt.id %}"
+           class="btn btn-primary btn-sm">
+
+            <i class="bi bi-file-earmark-medical"></i>
+            Prescription
+
+        </a>
+
+    {% else %}
+
+        <span style="color:var(--hms-muted);font-size:.8rem;">
+            —
+        </span>
+
+    {% endif %}
+
+</td>
           </tr>
           {% empty %}
           <tr id="emptyRow">
-            <td colspan="7">
+            <td colspan="8">
               <div class="empty-state">
                 <div class="empty-icon"><i class="bi bi-calendar2-x"></i></div>
                 <h6>No appointments found</h6>

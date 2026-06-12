@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <div class="card shadow p-4">
+
+        <h3>
+            Add Prescription
+        </h3>
+
+        <p>
+
+            Patient:
+            {{ appointment.patient.user.username }}
+
+        </p>
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <div class="mb-3">
+
+                <label>
+                    Diagnosis
+                </label>
+
+                <textarea
+                    name="diagnosis"
+                    class="form-control"
+                    required>
+                </textarea>
+
+            </div>
+
+            <div class="mb-3">
+
+                <label>
+                    Medicines
+                </label>
+
+                <textarea
+                    name="medicines"
+                    class="form-control"
+                    required>
+                </textarea>
+
+            </div>
+
+            <div class="mb-3">
+
+                <label>
+                    Notes
+                </label>
+
+                <textarea
+                    name="notes"
+                    class="form-control">
+                </textarea>
+
+            </div>
+
+            <button
+                class="btn btn-success">
+
+                Save Prescription
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -43,6 +43,9 @@ INSTALLED_APPS = [
     'patients',
     'appointments',
     'core',
+    'prescriptions',
+    'ai_assistant',
+
 ]
 
 MIDDLEWARE = [
@@ -147,6 +150,8 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 EMAIL_HOST_USER = 'avnigupta2505@gmail.com'
-EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST_PASSWORD = 'yrvl fcip ysgt rsvy'
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+GEMINI_API_KEY = ""
