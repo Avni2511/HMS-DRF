@@ -361,39 +361,39 @@ def book_appointment(request):
             status='Pending'
         )
 
-#         # EMAIL NOTIFICATION
-#         try:
+        # EMAIL NOTIFICATION
+        try:
 
-#             send_mail(
+            send_mail(
 
-#                 subject='Appointment Booked Successfully',
+                subject='Appointment Booked Successfully',
 
-#                 message=f'''
-# Hello {request.user.username},
+                message=f'''
+Hello {request.user.username},
 
-# Your appointment has been booked successfully.
+Your appointment has been booked successfully.
 
-# Doctor: Dr. {doctor.user.username}
+Doctor: Dr. {doctor.user.username}
 
-# Date: {date}
+Date: {date}
 
-# Time: {time}
+Time: {time}
 
-# Status: Pending
+Status: Pending
 
-# Thank you.
-#                 ''',
+Thank you.
+                ''',
 
-#                 from_email=settings.EMAIL_HOST_USER,
+                from_email=settings.EMAIL_HOST_USER,
 
-#                 recipient_list=[request.user.email],
+                recipient_list=[request.user.email],
 
-#                 fail_silently=False
-#             )
+                fail_silently=False
+            )
 
-#         except Exception as e:
+        except Exception as e:
 
-#             print("EMAIL ERROR:", e)
+            print("EMAIL ERROR:", e)
 
         messages.success(
             request,
