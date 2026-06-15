@@ -1,5 +1,6 @@
 import os
 import requests
+from Hospital import settings
 
 def send_email_sendgrid(to_email, subject, message):
     api_key = os.getenv("SENDGRID_API_KEY")
@@ -17,7 +18,7 @@ def send_email_sendgrid(to_email, subject, message):
                 "to": [{"email": to_email}]
             }
         ],
-        "from": {"email": "your_verified_email@domain.com"},
+        "from": {"email": settings.DEFAULT_FROM_EMAIL},
         "subject": subject,
         "content": [
             {
@@ -27,4 +28,12 @@ def send_email_sendgrid(to_email, subject, message):
         ]
     }
 
-    requests.post(url, headers=headers, json=data, timeout=5)
+    response = requests.post(
+        url,
+        headers=headers,
+        json=data,
+        timeout=5
+)
+
+    print("SENDGRID STATUS:", response.status_code)
+    print("SENDGRID RESPONSE:", response.text)

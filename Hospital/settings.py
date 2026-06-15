@@ -158,7 +158,7 @@ EMAIL_HOST_USER = 'apikey'
 EMAIL_HOST_PASSWORD = os.getenv('SENDGRID_API_KEY')
 
 GEMINI_API_KEY = ""
-
+DEFAULT_FROM_EMAIL = "avnigupta2505@gmail.com"
 
 CSRF_TRUSTED_ORIGINS = [
     "https://hms-drf-production.up.railway.app",
