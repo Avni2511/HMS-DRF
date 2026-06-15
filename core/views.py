@@ -361,11 +361,13 @@ def book_appointment(request):
         )
 
         # EMAIL NOTIFICATION
-        send_mail(
+        try:
 
-            subject='Appointment Booked Successfully',
+            send_mail(
 
-            message=f'''
+                subject='Appointment Booked Successfully',
+
+                message=f'''
 Hello {request.user.username},
 
 Your appointment has been booked successfully.
@@ -379,14 +381,18 @@ Time: {time}
 Status: Pending
 
 Thank you.
-            ''',
+                ''',
 
-            from_email=settings.EMAIL_HOST_USER,
+                from_email=settings.EMAIL_HOST_USER,
 
-            recipient_list=[request.user.email],
+                recipient_list=[request.user.email],
 
-            fail_silently=False
-        )
+                fail_silently=False
+            )
+
+        except Exception as e:
+
+            print("EMAIL ERROR:", e)
 
         messages.success(
             request,
@@ -406,6 +412,7 @@ Thank you.
         'appointments/book.html',
         context
     )
+
 @login_required
 def approve_appointment(request, appointment_id):
 
