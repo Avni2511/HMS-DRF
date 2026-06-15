@@ -336,6 +336,7 @@ def book_appointment(request):
     availability = DoctorAvailability.objects.all()
 
     if request.method == 'POST':
+        print("NEW CODE DEPLOYED")
 
         doctor_id = request.POST.get('doctor')
 
