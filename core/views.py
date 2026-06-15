@@ -9,6 +9,7 @@ from doctors.models import Doctor
 from patients.models import Patient
 from appointments.models import Appointment
 from doctors.models import DoctorAvailability
+from .utils import send_email_sendgrid
 
 User = get_user_model()
 
@@ -363,32 +364,22 @@ def book_appointment(request):
 
         # EMAIL NOTIFICATION
         try:
+            send_email_sendgrid(
+                to_email=request.user.email,
+                subject="Appointment Booked Successfully",
+                message=f"""
+            Hello {request.user.username},
 
-            send_mail(
+            Your appointment has been booked successfully.
 
-                subject='Appointment Booked Successfully',
+            Doctor: Dr. {doctor.user.username}
+            Date: {date}
+            Time: {time}
 
-                message=f'''
-Hello {request.user.username},
+            Status: Pending
 
-Your appointment has been booked successfully.
-
-Doctor: Dr. {doctor.user.username}
-
-Date: {date}
-
-Time: {time}
-
-Status: Pending
-
-Thank you.
-                ''',
-
-                from_email=settings.EMAIL_HOST_USER,
-
-                recipient_list=[request.user.email],
-
-                fail_silently=False
+            Thank you.
+            """
             )
 
         except Exception as e:
