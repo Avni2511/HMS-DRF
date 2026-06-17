@@ -1,2 +1,8 @@
 db.sqlite3
 data.json
+clean_data.json
+data_new.json
+data_utf8.json
+db_empty.sqlite3
+__pycache__/
+*.pyc
