@@ -132,7 +132,7 @@ def register_view(request):
 # =========================
 # HOME VIEW
 # =========================
-@login_required
+
 def home(request):
 
     return render(request, 'home.html')
@@ -256,7 +256,7 @@ def dashboard(request):
 # =========================
 # DOCTOR LIST
 # =========================
-@login_required
+
 def doctor_list(request):
 
     doctors = Doctor.objects.all()

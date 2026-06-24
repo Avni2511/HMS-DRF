@@ -141,7 +141,26 @@
       display: flex; align-items: center; justify-content: center;
       color: #fff; font-size: .75rem; font-weight: 700;
     }
+/* Mobile Navbar Dropdown Fix */
+@media (max-width: 991px) {
 
+  .hms-nav .navbar-collapse {
+    background: white;
+    padding: 15px;
+    margin-top: 10px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  }
+
+  .hms-nav .nav-link {
+    color: #1f2937 !important;
+  }
+
+  .hms-nav .nav-link i {
+    color: var(--hms-primary);
+  }
+
+}
     /* ── UTILITY COMPONENTS ────────────────────────────────────── */
     .hms-card {
       background: var(--hms-card);
@@ -396,62 +415,52 @@
       HMS
     </a>
 
-    <!-- Toggler (mobile) -->
-    <button class="navbar-toggler border-0 shadow-none" type="button"
-            data-bs-toggle="collapse" data-bs-target="#hmsNav">
-      <i class="bi bi-list fs-4" style="color:var(--hms-primary)"></i>
-    </button>
+    {% if not user.is_authenticated %}
+      <!-- Not logged in: toggler + links + login -->
+      <button class="navbar-toggler border-0 shadow-none" type="button"
+              data-bs-toggle="collapse" data-bs-target="#hmsNav">
+        <i class="bi bi-list fs-4" style="color:var(--hms-primary)"></i>
+      </button>
 
-    <!-- Links -->
-    <div class="collapse navbar-collapse" id="hmsNav">
-      <ul class="navbar-nav mx-auto gap-1">
-        <li class="nav-item">
-          <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
-             href="{% url 'home' %}">
-            <i class="bi bi-house-door"></i> Home
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link {% if 'doctor' in request.resolver_match.url_name %}active{% endif %}"
-             href="{% url 'doctor_list' %}">
-            <i class="bi bi-person-badge"></i> Doctors
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link {% if 'appointment' in request.resolver_match.url_name %}active{% endif %}"
-             href="{% url 'appointment_list' %}">
-            <i class="bi bi-calendar2-check"></i> Appointments
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link {% if 'dashboard' in request.resolver_match.url_name %}active{% endif %}"
-             href="{% url 'dashboard' %}">
-            <i class="bi bi-grid-1x2"></i> Dashboard
-          </a>
-        </li>
-      </ul>
+      <div class="collapse navbar-collapse" id="hmsNav">
+        <ul class="navbar-nav mx-auto gap-1">
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+               href="{% url 'home' %}">
+              <i class="bi bi-house-door"></i> Home
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if 'doctor' in request.resolver_match.url_name %}active{% endif %}"
+               href="{% url 'doctor_list' %}">
+              <i class="bi bi-person-badge"></i> Doctors
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if 'appointment' in request.resolver_match.url_name %}active{% endif %}"
+               href="{% url 'appointment_list' %}">
+              <i class="bi bi-calendar2-check"></i> Appointments
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if 'dashboard' in request.resolver_match.url_name %}active{% endif %}"
+               href="{% url 'dashboard' %}">
+              <i class="bi bi-grid-1x2"></i> Dashboard
+            </a>
+          </li>
+        </ul>
 
-      <!-- Auth -->
-      <div class="d-flex align-items-center gap-2 mt-2 mt-lg-0">
-        {% if user.is_authenticated %}
-          <div class="nav-user-pill">
-            <div class="nav-avatar">{{ user.username|first|upper }}</div>
-            {{ user.username }}
-          </div>
-          <div class="nav-divider d-none d-lg-block"></div>
-          <a href="{% url 'logout' %}" class="btn-nav-logout">
-            <i class="bi bi-box-arrow-right me-1"></i>Logout
-          </a>
-        {% else %}
-          <a href="{% url 'login' %}" class="btn-nav-login">
+        <div class="d-flex mt-3 mt-lg-0">
+          <a href="{% url 'login' %}" class="btn-nav-login text-center">
             <i class="bi bi-box-arrow-in-right me-1"></i>Login
           </a>
-        {% endif %}
+        </div>
       </div>
-    </div>
+    {% endif %}
+    <!-- Logged in: nothing extra shown, sidebar already has user info & logout -->
+
   </div>
 </nav>
-
 <!-- ═══════════════════════════════════ MESSAGES ═════════════ -->
 {% if messages %}
 <div class="container mt-3">
